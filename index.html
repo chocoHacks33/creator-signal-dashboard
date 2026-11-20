@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A focused dashboard for reviewing creator content performance and upcoming posts."
+    />
+    <title>Creator Signal Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to dashboard</a>
+
+    <header class="site-header">
+      <div>
+        <p class="eyebrow">Weekly studio pulse</p>
+        <h1>Creator Signal</h1>
+        <p class="intro">See what shipped, what resonated, and what is coming next.</p>
+      </div>
+      <span class="week-badge" aria-label="Reporting period">Nov 16–22</span>
+    </header>
+
+    <main id="main-content" class="dashboard" tabindex="-1">
+      <section aria-labelledby="overview-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">At a glance</p>
+            <h2 id="overview-heading">Weekly overview</h2>
+          </div>
+          <p id="last-updated" class="muted"></p>
+        </div>
+        <div id="metric-grid" class="metric-grid"></div>
+      </section>
+
+      <section aria-labelledby="content-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Content log</p>
+            <h2 id="content-heading">Recent and upcoming</h2>
+          </div>
+          <p class="muted">Views reflect published content only.</p>
+        </div>
+        <div id="content-grid" class="content-grid"></div>
+      </section>
+    </main>
+
+    <noscript>
+      <p class="noscript-message">Enable JavaScript to render the creator analytics dashboard.</p>
+    </noscript>
+  </body>
+</html>
+
