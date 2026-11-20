@@ -5,6 +5,7 @@ const {
   contentItems,
   summarizeContent,
   formatCompactNumber,
+  filterContentByPlatform,
   metricCardTemplate,
   contentCardTemplate,
 } = require("../app.js");
@@ -32,6 +33,20 @@ test("summarizeContent totals only published performance", () => {
 test("formatCompactNumber keeps large dashboard values readable", () => {
   assert.equal(formatCompactNumber(18420), "18.4K");
   assert.equal(formatCompactNumber(950), "950");
+});
+
+test("filterContentByPlatform returns only the selected platform", () => {
+  const filtered = filterContentByPlatform(contentItems, "Newsletter");
+
+  assert.equal(filtered.length, 2);
+  assert.ok(filtered.every((item) => item.platform === "Newsletter"));
+});
+
+test("filterContentByPlatform returns a copy for the all-platform view", () => {
+  const filtered = filterContentByPlatform(contentItems, "All");
+
+  assert.deepEqual(filtered, contentItems);
+  assert.notEqual(filtered, contentItems);
 });
 
 test("metric card template exposes its label and value", () => {

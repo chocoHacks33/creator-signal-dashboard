@@ -79,6 +79,14 @@ function formatCompactNumber(value) {
   }).format(value);
 }
 
+function filterContentByPlatform(items, platform) {
+  if (!platform || platform === "All") {
+    return [...items];
+  }
+
+  return items.filter((item) => item.platform === platform);
+}
+
 function metricCardTemplate(label, value) {
   return `
     <article class="metric-card">
@@ -118,6 +126,8 @@ function renderDashboard(doc = document) {
   const metricGrid = doc.querySelector("#metric-grid");
   const contentGrid = doc.querySelector("#content-grid");
   const lastUpdated = doc.querySelector("#last-updated");
+  const platformFilter = doc.querySelector("#platform-filter");
+  const filterSummary = doc.querySelector("#filter-summary");
 
   metricGrid.innerHTML = [
     metricCardTemplate("Posts published", summary.published),
@@ -126,8 +136,20 @@ function renderDashboard(doc = document) {
     metricCardTemplate("Posts scheduled", summary.scheduled),
   ].join("");
 
-  contentGrid.innerHTML = contentItems.map(contentCardTemplate).join("");
   lastUpdated.textContent = "Updated from this week's content log";
+
+  const renderContent = () => {
+    const platform = platformFilter.value;
+    const visibleItems = filterContentByPlatform(contentItems, platform);
+    contentGrid.innerHTML = visibleItems.map(contentCardTemplate).join("");
+    filterSummary.textContent =
+      platform === "All"
+        ? `Showing all ${visibleItems.length} content items.`
+        : `Showing ${visibleItems.length} ${platform} content ${visibleItems.length === 1 ? "item" : "items"}.`;
+  };
+
+  platformFilter.addEventListener("change", renderContent);
+  renderContent();
 }
 
 if (typeof document !== "undefined") {
@@ -139,6 +161,7 @@ if (typeof module !== "undefined") {
     contentItems,
     summarizeContent,
     formatCompactNumber,
+    filterContentByPlatform,
     metricCardTemplate,
     contentCardTemplate,
   };

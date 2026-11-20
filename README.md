@@ -6,6 +6,7 @@ A small, dependency-free dashboard for creators who want a calm weekly view of p
 
 - Summary cards for published posts, total views, follower growth, and scheduled content
 - A recent-content feed spanning video, social, and newsletter channels
+- Platform filtering for focusing the content feed on a single channel
 - Responsive styling and semantic dashboard landmarks
 - Sample data that can be replaced with an API or local persistence later
 
