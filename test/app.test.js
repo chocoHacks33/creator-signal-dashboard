@@ -5,6 +5,8 @@ const {
   contentItems,
   summarizeContent,
   formatCompactNumber,
+  calculateEngagementRate,
+  rankPublishedByEngagement,
   metricCardTemplate,
   contentCardTemplate,
 } = require("../app.js");
@@ -32,6 +34,26 @@ test("summarizeContent totals only published performance", () => {
 test("formatCompactNumber keeps large dashboard values readable", () => {
   assert.equal(formatCompactNumber(18420), "18.4K");
   assert.equal(formatCompactNumber(950), "950");
+});
+
+test("calculateEngagementRate measures all interactions against views", () => {
+  const rate = calculateEngagementRate({
+    views: 1000,
+    likes: 60,
+    comments: 15,
+    shares: 25,
+  });
+
+  assert.equal(rate, 10);
+  assert.equal(calculateEngagementRate({ views: 0, likes: 5, comments: 2, shares: 1 }), 0);
+});
+
+test("rankPublishedByEngagement excludes scheduled content and sorts descending", () => {
+  const ranked = rankPublishedByEngagement(contentItems, 2);
+
+  assert.equal(ranked.length, 2);
+  assert.ok(ranked[0].engagementRate >= ranked[1].engagementRate);
+  assert.ok(ranked.every((item) => item.status === "Published"));
 });
 
 test("metric card template exposes its label and value", () => {

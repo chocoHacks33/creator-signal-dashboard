@@ -7,6 +7,9 @@ const contentItems = [
     publishedAt: "2026-11-16",
     views: 18420,
     followersGained: 143,
+    likes: 1240,
+    comments: 94,
+    shares: 108,
   },
   {
     id: 2,
@@ -16,6 +19,9 @@ const contentItems = [
     publishedAt: "2026-11-17",
     views: 6830,
     followersGained: 84,
+    likes: 510,
+    comments: 82,
+    shares: 64,
   },
   {
     id: 3,
@@ -25,6 +31,9 @@ const contentItems = [
     publishedAt: "2026-11-18",
     views: 12100,
     followersGained: 96,
+    likes: 1530,
+    comments: 71,
+    shares: 210,
   },
   {
     id: 4,
@@ -34,6 +43,9 @@ const contentItems = [
     publishedAt: "2026-11-19",
     views: 22900,
     followersGained: 177,
+    likes: 2480,
+    comments: 119,
+    shares: 355,
   },
   {
     id: 5,
@@ -43,6 +55,9 @@ const contentItems = [
     publishedAt: "2026-11-21",
     views: 0,
     followersGained: 0,
+    likes: 0,
+    comments: 0,
+    shares: 0,
   },
   {
     id: 6,
@@ -52,6 +67,9 @@ const contentItems = [
     publishedAt: "2026-11-22",
     views: 0,
     followersGained: 0,
+    likes: 0,
+    comments: 0,
+    shares: 0,
   },
 ];
 
@@ -77,6 +95,36 @@ function formatCompactNumber(value) {
     notation: "compact",
     maximumFractionDigits: 1,
   }).format(value);
+}
+
+function calculateEngagementRate(item) {
+  if (!item.views) {
+    return 0;
+  }
+
+  const interactions = item.likes + item.comments + item.shares;
+  return (interactions / item.views) * 100;
+}
+
+function rankPublishedByEngagement(items, limit = 3) {
+  return items
+    .filter((item) => item.status === "Published" && item.views > 0)
+    .map((item) => ({ ...item, engagementRate: calculateEngagementRate(item) }))
+    .sort((left, right) => right.engagementRate - left.engagementRate)
+    .slice(0, limit);
+}
+
+function engagementCardTemplate(item, index) {
+  const interactions = item.likes + item.comments + item.shares;
+
+  return `
+    <article class="insight-card">
+      <span class="insight-rank" aria-label="Rank ${index + 1}">${index + 1}</span>
+      <h3>${item.title}</h3>
+      <p class="engagement-rate">${item.engagementRate.toFixed(1)}% engagement</p>
+      <p class="muted">${formatCompactNumber(interactions)} interactions on ${item.platform}</p>
+    </article>
+  `;
 }
 
 function metricCardTemplate(label, value) {
@@ -117,6 +165,7 @@ function renderDashboard(doc = document) {
   const summary = summarizeContent(contentItems);
   const metricGrid = doc.querySelector("#metric-grid");
   const contentGrid = doc.querySelector("#content-grid");
+  const engagementGrid = doc.querySelector("#engagement-grid");
   const lastUpdated = doc.querySelector("#last-updated");
 
   metricGrid.innerHTML = [
@@ -127,6 +176,9 @@ function renderDashboard(doc = document) {
   ].join("");
 
   contentGrid.innerHTML = contentItems.map(contentCardTemplate).join("");
+  engagementGrid.innerHTML = rankPublishedByEngagement(contentItems)
+    .map(engagementCardTemplate)
+    .join("");
   lastUpdated.textContent = "Updated from this week's content log";
 }
 
@@ -139,6 +191,9 @@ if (typeof module !== "undefined") {
     contentItems,
     summarizeContent,
     formatCompactNumber,
+    calculateEngagementRate,
+    rankPublishedByEngagement,
+    engagementCardTemplate,
     metricCardTemplate,
     contentCardTemplate,
   };
