@@ -35,6 +35,23 @@
         <div id="metric-grid" class="metric-grid"></div>
       </section>
 
+      <section class="goal-panel" aria-labelledby="goal-heading">
+        <div>
+          <p class="eyebrow">Intentional growth</p>
+          <h2 id="goal-heading">Weekly reach goal</h2>
+          <p id="goal-summary" class="goal-summary"></p>
+          <progress id="goal-progress" aria-label="Weekly reach goal progress"></progress>
+        </div>
+        <form id="goal-form" class="goal-form">
+          <label for="reach-goal">Target views</label>
+          <div class="goal-input-row">
+            <input id="reach-goal" name="reach-goal" type="number" min="1000" step="1000" required />
+            <button type="submit">Save goal</button>
+          </div>
+          <p id="goal-status" class="muted" aria-live="polite"></p>
+        </form>
+      </section>
+
       <section aria-labelledby="content-heading">
         <div class="section-heading">
           <div>
