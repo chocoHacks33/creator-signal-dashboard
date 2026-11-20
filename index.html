@@ -41,8 +41,18 @@
             <p class="eyebrow">Content log</p>
             <h2 id="content-heading">Recent and upcoming</h2>
           </div>
-          <p class="muted">Views reflect published content only.</p>
+          <label class="filter-control" for="platform-filter">
+            Platform
+            <select id="platform-filter">
+              <option value="All">All platforms</option>
+              <option value="YouTube">YouTube</option>
+              <option value="Newsletter">Newsletter</option>
+              <option value="Instagram">Instagram</option>
+              <option value="TikTok">TikTok</option>
+            </select>
+          </label>
         </div>
+        <p id="filter-summary" class="muted" aria-live="polite"></p>
         <div id="content-grid" class="content-grid"></div>
       </section>
     </main>
