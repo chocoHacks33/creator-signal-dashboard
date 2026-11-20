@@ -3,8 +3,10 @@ const assert = require("node:assert/strict");
 
 const {
   contentItems,
+  reportingDays,
   summarizeContent,
   formatCompactNumber,
+  buildReachTrend,
   metricCardTemplate,
   contentCardTemplate,
 } = require("../app.js");
@@ -32,6 +34,29 @@ test("summarizeContent totals only published performance", () => {
 test("formatCompactNumber keeps large dashboard values readable", () => {
   assert.equal(formatCompactNumber(18420), "18.4K");
   assert.equal(formatCompactNumber(950), "950");
+});
+
+test("buildReachTrend fills quiet days and totals matching published items", () => {
+  const trend = buildReachTrend(
+    [
+      { status: "Published", publishedAt: "2026-11-16", views: 120 },
+      { status: "Published", publishedAt: "2026-11-16", views: 80 },
+      { status: "Scheduled", publishedAt: "2026-11-17", views: 900 },
+    ],
+    ["2026-11-16", "2026-11-17"],
+  );
+
+  assert.deepEqual(trend, [
+    { day: "2026-11-16", views: 200 },
+    { day: "2026-11-17", views: 0 },
+  ]);
+});
+
+test("the dashboard trend covers the full reporting week", () => {
+  const trend = buildReachTrend(contentItems, reportingDays);
+
+  assert.equal(trend.length, 7);
+  assert.equal(trend.reduce((total, point) => total + point.views, 0), 60250);
 });
 
 test("metric card template exposes its label and value", () => {
