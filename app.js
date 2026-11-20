@@ -79,6 +79,40 @@ function formatCompactNumber(value) {
   }).format(value);
 }
 
+function escapeCsvCell(value) {
+  const original = String(value ?? "");
+  const neutralized = /^[=+\-@]/.test(original.trimStart()) ? `'${original}` : original;
+  return `"${neutralized.replace(/"/g, '""')}"`;
+}
+
+function contentToCsv(items) {
+  const rows = [
+    ["Title", "Platform", "Status", "Publish date", "Views", "Followers gained"],
+    ...items.map((item) => [
+      item.title,
+      item.platform,
+      item.status,
+      item.publishedAt,
+      item.views,
+      item.followersGained,
+    ]),
+  ];
+
+  return rows.map((row) => row.map(escapeCsvCell).join(",")).join("\r\n");
+}
+
+function downloadContentCsv(items, doc, urlApi) {
+  const blob = new Blob(["\uFEFF", contentToCsv(items)], { type: "text/csv;charset=utf-8" });
+  const objectUrl = urlApi.createObjectURL(blob);
+  const link = doc.createElement("a");
+  link.href = objectUrl;
+  link.download = "creator-signal-content.csv";
+  doc.body.append(link);
+  link.click();
+  link.remove();
+  urlApi.revokeObjectURL(objectUrl);
+}
+
 function metricCardTemplate(label, value) {
   return `
     <article class="metric-card">
@@ -118,6 +152,8 @@ function renderDashboard(doc = document) {
   const metricGrid = doc.querySelector("#metric-grid");
   const contentGrid = doc.querySelector("#content-grid");
   const lastUpdated = doc.querySelector("#last-updated");
+  const exportButton = doc.querySelector("#export-content");
+  const exportStatus = doc.querySelector("#export-status");
 
   metricGrid.innerHTML = [
     metricCardTemplate("Posts published", summary.published),
@@ -128,6 +164,10 @@ function renderDashboard(doc = document) {
 
   contentGrid.innerHTML = contentItems.map(contentCardTemplate).join("");
   lastUpdated.textContent = "Updated from this week's content log";
+  exportButton.addEventListener("click", () => {
+    downloadContentCsv(contentItems, doc, URL);
+    exportStatus.textContent = `Downloaded ${contentItems.length} content items.`;
+  });
 }
 
 if (typeof document !== "undefined") {
@@ -139,6 +179,8 @@ if (typeof module !== "undefined") {
     contentItems,
     summarizeContent,
     formatCompactNumber,
+    escapeCsvCell,
+    contentToCsv,
     metricCardTemplate,
     contentCardTemplate,
   };
