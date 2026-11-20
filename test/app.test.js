@@ -5,6 +5,8 @@ const {
   contentItems,
   summarizeContent,
   formatCompactNumber,
+  escapeCsvCell,
+  contentToCsv,
   metricCardTemplate,
   contentCardTemplate,
 } = require("../app.js");
@@ -32,6 +34,24 @@ test("summarizeContent totals only published performance", () => {
 test("formatCompactNumber keeps large dashboard values readable", () => {
   assert.equal(formatCompactNumber(18420), "18.4K");
   assert.equal(formatCompactNumber(950), "950");
+});
+
+test("escapeCsvCell quotes punctuation and neutralizes spreadsheet formulas", () => {
+  assert.equal(escapeCsvCell('A title, with "quotes"'), '"A title, with ""quotes"""');
+  assert.equal(escapeCsvCell("=IMPORTXML(A1)"), '"\'=IMPORTXML(A1)"');
+  assert.equal(escapeCsvCell("  +SUM(A1:A2)"), '"\'  +SUM(A1:A2)"');
+});
+
+test("contentToCsv exports a stable header and one row per content item", () => {
+  const csv = contentToCsv(contentItems);
+  const rows = csv.split("\r\n");
+
+  assert.equal(rows.length, contentItems.length + 1);
+  assert.equal(
+    rows[0],
+    '"Title","Platform","Status","Publish date","Views","Followers gained"',
+  );
+  assert.match(rows[1], /"Five-minute desk reset","YouTube","Published"/);
 });
 
 test("metric card template exposes its label and value", () => {
