@@ -136,6 +136,90 @@ h2 {
   gap: 1rem;
 }
 
+.goal-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.65fr);
+  gap: 2rem;
+  align-items: end;
+  padding: clamp(1.3rem, 4vw, 2rem);
+  border-radius: 1.2rem;
+  background: var(--ink);
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+.goal-panel .eyebrow {
+  color: #91d0ac;
+}
+
+.goal-summary {
+  margin: 0.5rem 0 0.7rem;
+  color: #c5d2cc;
+}
+
+.goal-panel progress {
+  width: 100%;
+  height: 0.8rem;
+  overflow: hidden;
+  border: 0;
+  border-radius: 999px;
+  background: #45534d;
+}
+
+.goal-panel progress::-webkit-progress-bar {
+  background: #45534d;
+}
+
+.goal-panel progress::-webkit-progress-value {
+  background: #8ed0a9;
+}
+
+.goal-panel progress::-moz-progress-bar {
+  background: #8ed0a9;
+}
+
+.goal-form {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.goal-form label {
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.goal-input-row {
+  display: flex;
+  gap: 0.55rem;
+}
+
+.goal-input-row input,
+.goal-input-row button {
+  min-height: 2.8rem;
+  border: 0;
+  border-radius: 0.7rem;
+  font: inherit;
+}
+
+.goal-input-row input {
+  min-width: 0;
+  flex: 1;
+  padding-inline: 0.8rem;
+}
+
+.goal-input-row button {
+  padding-inline: 1rem;
+  background: var(--accent);
+  color: #29170d;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.goal-panel .muted {
+  min-height: 1.35rem;
+  color: #c5d2cc;
+}
+
 .metric-card,
 .content-card {
   border: 1px solid var(--line);
@@ -241,6 +325,10 @@ h2 {
 }
 
 @media (max-width: 820px) {
+  .goal-panel {
+    grid-template-columns: 1fr;
+  }
+
   .metric-grid,
   .content-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -55,6 +55,9 @@ const contentItems = [
   },
 ];
 
+const REACH_GOAL_KEY = "creator-signal-reach-goal";
+const DEFAULT_REACH_GOAL = 75000;
+
 function summarizeContent(items) {
   return items.reduce(
     (summary, item) => {
@@ -77,6 +80,88 @@ function formatCompactNumber(value) {
     notation: "compact",
     maximumFractionDigits: 1,
   }).format(value);
+}
+
+function parseReachGoal(value) {
+  const parsed = Number(value);
+
+  if (!Number.isFinite(parsed) || parsed < 1000) {
+    return null;
+  }
+
+  return Math.round(parsed);
+}
+
+function calculateGoalProgress(currentViews, goal) {
+  const validGoal = parseReachGoal(goal);
+  if (!validGoal) {
+    return 0;
+  }
+
+  return Math.min(100, Math.round((currentViews / validGoal) * 100));
+}
+
+function readReachGoal(storage) {
+  if (!storage) {
+    return DEFAULT_REACH_GOAL;
+  }
+
+  try {
+    return parseReachGoal(storage.getItem(REACH_GOAL_KEY)) ?? DEFAULT_REACH_GOAL;
+  } catch {
+    return DEFAULT_REACH_GOAL;
+  }
+}
+
+function saveReachGoal(storage, value) {
+  const goal = parseReachGoal(value);
+  if (!storage || !goal) {
+    return false;
+  }
+
+  try {
+    storage.setItem(REACH_GOAL_KEY, String(goal));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function setupReachGoal(doc, storage, currentViews) {
+  const form = doc.querySelector("#goal-form");
+  const input = doc.querySelector("#reach-goal");
+  const progress = doc.querySelector("#goal-progress");
+  const summary = doc.querySelector("#goal-summary");
+  const status = doc.querySelector("#goal-status");
+  let goal = readReachGoal(storage);
+
+  const render = () => {
+    input.value = goal;
+    progress.max = goal;
+    progress.value = Math.min(currentViews, goal);
+    summary.textContent = `${formatCompactNumber(currentViews)} of ${formatCompactNumber(goal)} views (${calculateGoalProgress(currentViews, goal)}%).`;
+  };
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const nextGoal = parseReachGoal(input.value);
+
+    if (!nextGoal) {
+      status.textContent = "Enter a goal of at least 1,000 views.";
+      return;
+    }
+
+    if (!saveReachGoal(storage, nextGoal)) {
+      status.textContent = "This browser could not save the goal.";
+      return;
+    }
+
+    goal = nextGoal;
+    render();
+    status.textContent = "Reach goal saved.";
+  });
+
+  render();
 }
 
 function metricCardTemplate(label, value) {
@@ -128,6 +213,7 @@ function renderDashboard(doc = document) {
 
   contentGrid.innerHTML = contentItems.map(contentCardTemplate).join("");
   lastUpdated.textContent = "Updated from this week's content log";
+  setupReachGoal(doc, window.localStorage, summary.views);
 }
 
 if (typeof document !== "undefined") {
@@ -139,6 +225,10 @@ if (typeof module !== "undefined") {
     contentItems,
     summarizeContent,
     formatCompactNumber,
+    parseReachGoal,
+    calculateGoalProgress,
+    readReachGoal,
+    saveReachGoal,
     metricCardTemplate,
     contentCardTemplate,
   };

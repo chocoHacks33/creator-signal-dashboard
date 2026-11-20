@@ -5,6 +5,10 @@ const {
   contentItems,
   summarizeContent,
   formatCompactNumber,
+  parseReachGoal,
+  calculateGoalProgress,
+  readReachGoal,
+  saveReachGoal,
   metricCardTemplate,
   contentCardTemplate,
 } = require("../app.js");
@@ -32,6 +36,31 @@ test("summarizeContent totals only published performance", () => {
 test("formatCompactNumber keeps large dashboard values readable", () => {
   assert.equal(formatCompactNumber(18420), "18.4K");
   assert.equal(formatCompactNumber(950), "950");
+});
+
+test("reach goals require a useful finite target", () => {
+  assert.equal(parseReachGoal("90000"), 90000);
+  assert.equal(parseReachGoal("not-a-number"), null);
+  assert.equal(parseReachGoal(500), null);
+});
+
+test("calculateGoalProgress caps completed goals at 100 percent", () => {
+  assert.equal(calculateGoalProgress(60000, 80000), 75);
+  assert.equal(calculateGoalProgress(90000, 80000), 100);
+  assert.equal(calculateGoalProgress(5000, 0), 0);
+});
+
+test("reach goals persist through the supplied storage adapter", () => {
+  const values = new Map();
+  const storage = {
+    getItem: (key) => values.get(key) ?? null,
+    setItem: (key, value) => values.set(key, value),
+  };
+
+  assert.equal(readReachGoal(storage), 75000);
+  assert.equal(saveReachGoal(storage, 92000), true);
+  assert.equal(readReachGoal(storage), 92000);
+  assert.equal(saveReachGoal(storage, 200), false);
 });
 
 test("metric card template exposes its label and value", () => {
