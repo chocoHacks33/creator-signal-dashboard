@@ -5,6 +5,7 @@ const {
   contentItems,
   summarizeContent,
   formatCompactNumber,
+  sortContentItems,
   metricCardTemplate,
   contentCardTemplate,
 } = require("../app.js");
@@ -12,6 +13,19 @@ const {
 test("sample content includes published and scheduled work", () => {
   assert.ok(contentItems.some((item) => item.status === "Published"));
   assert.ok(contentItems.some((item) => item.status === "Scheduled"));
+});
+
+test("sortContentItems supports date and view ordering without mutating input", () => {
+  const items = [
+    { id: 1, publishedAt: "2026-11-18", views: 200 },
+    { id: 2, publishedAt: "2026-11-20", views: 100 },
+    { id: 3, publishedAt: "2026-11-19", views: 300 },
+  ];
+
+  assert.deepEqual(sortContentItems(items, "newest").map((item) => item.id), [2, 3, 1]);
+  assert.deepEqual(sortContentItems(items, "oldest").map((item) => item.id), [1, 3, 2]);
+  assert.deepEqual(sortContentItems(items, "views").map((item) => item.id), [3, 1, 2]);
+  assert.deepEqual(items.map((item) => item.id), [1, 2, 3]);
 });
 
 test("summarizeContent totals only published performance", () => {

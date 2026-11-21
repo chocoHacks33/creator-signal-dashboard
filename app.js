@@ -79,6 +79,22 @@ function formatCompactNumber(value) {
   }).format(value);
 }
 
+function sortContentItems(items, order = "newest") {
+  const sortedItems = [...items];
+
+  if (order === "oldest") {
+    return sortedItems.sort((a, b) => a.publishedAt.localeCompare(b.publishedAt));
+  }
+
+  if (order === "views") {
+    return sortedItems.sort(
+      (a, b) => b.views - a.views || b.publishedAt.localeCompare(a.publishedAt),
+    );
+  }
+
+  return sortedItems.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+}
+
 function metricCardTemplate(label, value) {
   return `
     <article class="metric-card">
@@ -118,6 +134,7 @@ function renderDashboard(doc = document) {
   const metricGrid = doc.querySelector("#metric-grid");
   const contentGrid = doc.querySelector("#content-grid");
   const lastUpdated = doc.querySelector("#last-updated");
+  const sortSelect = doc.querySelector("#content-sort");
 
   metricGrid.innerHTML = [
     metricCardTemplate("Posts published", summary.published),
@@ -126,7 +143,14 @@ function renderDashboard(doc = document) {
     metricCardTemplate("Posts scheduled", summary.scheduled),
   ].join("");
 
-  contentGrid.innerHTML = contentItems.map(contentCardTemplate).join("");
+  const renderContent = (order) => {
+    contentGrid.innerHTML = sortContentItems(contentItems, order)
+      .map(contentCardTemplate)
+      .join("");
+  };
+
+  renderContent(sortSelect.value);
+  sortSelect.addEventListener("change", (event) => renderContent(event.target.value));
   lastUpdated.textContent = "Updated from this week's content log";
 }
 
@@ -139,6 +163,7 @@ if (typeof module !== "undefined") {
     contentItems,
     summarizeContent,
     formatCompactNumber,
+    sortContentItems,
     metricCardTemplate,
     contentCardTemplate,
   };

@@ -169,6 +169,28 @@ h2 {
   gap: 1rem;
 }
 
+.sort-control {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.sort-control label {
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
+.sort-control select {
+  padding: 0.65rem 2.25rem 0.65rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+
 .content-card {
   display: flex;
   min-height: 13rem;
@@ -261,6 +283,11 @@ h2 {
   .metric-grid,
   .content-grid {
     grid-template-columns: 1fr;
+  }
+
+  .sort-control {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 
