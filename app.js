@@ -79,6 +79,31 @@ function formatCompactNumber(value) {
   }).format(value);
 }
 
+function daysUntil(date, today = new Date()) {
+  const target = Date.parse(`${date}T00:00:00Z`);
+  const todayAtUtcMidnight = Date.UTC(
+    today.getUTCFullYear(),
+    today.getUTCMonth(),
+    today.getUTCDate(),
+  );
+
+  return Math.round((target - todayAtUtcMidnight) / 86_400_000);
+}
+
+function scheduleTimingLabel(item, today = new Date()) {
+  if (item.status !== "Scheduled") {
+    return "";
+  }
+
+  const remainingDays = daysUntil(item.publishedAt, today);
+
+  if (remainingDays === 0) return "Scheduled for today";
+  if (remainingDays === 1) return "Scheduled for tomorrow";
+  if (remainingDays > 1) return `Scheduled in ${remainingDays} days`;
+  if (remainingDays === -1) return "1 day overdue";
+  return `${Math.abs(remainingDays)} days overdue`;
+}
+
 function metricCardTemplate(label, value) {
   return `
     <article class="metric-card">
@@ -88,7 +113,7 @@ function metricCardTemplate(label, value) {
   `;
 }
 
-function contentCardTemplate(item) {
+function contentCardTemplate(item, today = new Date()) {
   const displayDate = new Intl.DateTimeFormat("en", {
     month: "short",
     day: "numeric",
@@ -96,6 +121,7 @@ function contentCardTemplate(item) {
   }).format(new Date(`${item.publishedAt}T00:00:00Z`));
 
   const viewLabel = item.status === "Published" ? formatCompactNumber(item.views) : "—";
+  const timingLabel = scheduleTimingLabel(item, today);
 
   return `
     <article class="content-card">
@@ -105,6 +131,7 @@ function contentCardTemplate(item) {
       </div>
       <h3>${item.title}</h3>
       <p class="publish-date">${item.status === "Published" ? "Published" : "Scheduled for"} ${displayDate}</p>
+      ${timingLabel ? `<p class="schedule-timing">${timingLabel}</p>` : ""}
       <div class="card-stats">
         <span><strong>${viewLabel}</strong> views</span>
         <span><strong>${item.followersGained || "—"}</strong> new followers</span>
@@ -139,6 +166,8 @@ if (typeof module !== "undefined") {
     contentItems,
     summarizeContent,
     formatCompactNumber,
+    daysUntil,
+    scheduleTimingLabel,
     metricCardTemplate,
     contentCardTemplate,
   };
