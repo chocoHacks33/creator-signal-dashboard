@@ -79,6 +79,42 @@ function formatCompactNumber(value) {
   }).format(value);
 }
 
+function summarizePlatforms(items) {
+  const platforms = new Map();
+
+  items
+    .filter((item) => item.status === "Published")
+    .forEach((item) => {
+      const summary = platforms.get(item.platform) || {
+        platform: item.platform,
+        posts: 0,
+        views: 0,
+        followersGained: 0,
+      };
+
+      summary.posts += 1;
+      summary.views += item.views;
+      summary.followersGained += item.followersGained;
+      platforms.set(item.platform, summary);
+    });
+
+  return [...platforms.values()].sort(
+    (a, b) => b.views - a.views || a.platform.localeCompare(b.platform),
+  );
+}
+
+function platformCardTemplate(platform) {
+  const postLabel = platform.posts === 1 ? "post" : "posts";
+
+  return `
+    <article class="platform-card">
+      <h3>${platform.platform}</h3>
+      <p><strong>${formatCompactNumber(platform.views)}</strong> views</p>
+      <p>${platform.posts} ${postLabel} · +${platform.followersGained} followers</p>
+    </article>
+  `;
+}
+
 function metricCardTemplate(label, value) {
   return `
     <article class="metric-card">
@@ -117,6 +153,7 @@ function renderDashboard(doc = document) {
   const summary = summarizeContent(contentItems);
   const metricGrid = doc.querySelector("#metric-grid");
   const contentGrid = doc.querySelector("#content-grid");
+  const platformGrid = doc.querySelector("#platform-grid");
   const lastUpdated = doc.querySelector("#last-updated");
 
   metricGrid.innerHTML = [
@@ -127,6 +164,7 @@ function renderDashboard(doc = document) {
   ].join("");
 
   contentGrid.innerHTML = contentItems.map(contentCardTemplate).join("");
+  platformGrid.innerHTML = summarizePlatforms(contentItems).map(platformCardTemplate).join("");
   lastUpdated.textContent = "Updated from this week's content log";
 }
 
@@ -139,6 +177,8 @@ if (typeof module !== "undefined") {
     contentItems,
     summarizeContent,
     formatCompactNumber,
+    summarizePlatforms,
+    platformCardTemplate,
     metricCardTemplate,
     contentCardTemplate,
   };

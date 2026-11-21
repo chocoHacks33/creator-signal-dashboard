@@ -5,6 +5,8 @@ const {
   contentItems,
   summarizeContent,
   formatCompactNumber,
+  summarizePlatforms,
+  platformCardTemplate,
   metricCardTemplate,
   contentCardTemplate,
 } = require("../app.js");
@@ -12,6 +14,33 @@ const {
 test("sample content includes published and scheduled work", () => {
   assert.ok(contentItems.some((item) => item.status === "Published"));
   assert.ok(contentItems.some((item) => item.status === "Scheduled"));
+});
+
+test("summarizePlatforms aggregates published results and ranks by views", () => {
+  const summaries = summarizePlatforms([
+    { platform: "Video", status: "Published", views: 100, followersGained: 4 },
+    { platform: "Video", status: "Published", views: 250, followersGained: 8 },
+    { platform: "Mail", status: "Published", views: 500, followersGained: 5 },
+    { platform: "Mail", status: "Scheduled", views: 900, followersGained: 20 },
+  ]);
+
+  assert.deepEqual(summaries, [
+    { platform: "Mail", posts: 1, views: 500, followersGained: 5 },
+    { platform: "Video", posts: 2, views: 350, followersGained: 12 },
+  ]);
+});
+
+test("platformCardTemplate uses singular post grammar", () => {
+  const html = platformCardTemplate({
+    platform: "Newsletter",
+    posts: 1,
+    views: 1200,
+    followersGained: 14,
+  });
+
+  assert.match(html, /Newsletter/);
+  assert.match(html, /1 post · \+14 followers/);
+  assert.match(html, /1\.2K/);
 });
 
 test("summarizeContent totals only published performance", () => {
