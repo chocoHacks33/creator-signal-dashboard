@@ -43,6 +43,17 @@
           </div>
           <p class="muted">Views reflect published content only.</p>
         </div>
+        <div class="content-search">
+          <label for="content-search">Search the content log</label>
+          <input
+            id="content-search"
+            type="search"
+            placeholder="Search by title, platform, or status"
+            autocomplete="off"
+            aria-describedby="content-results"
+          />
+          <p id="content-results" class="muted" role="status" aria-live="polite"></p>
+        </div>
         <div id="content-grid" class="content-grid"></div>
       </section>
     </main>

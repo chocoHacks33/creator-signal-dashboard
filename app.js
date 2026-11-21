@@ -79,6 +79,20 @@ function formatCompactNumber(value) {
   }).format(value);
 }
 
+function filterContent(items, query) {
+  const normalizedQuery = query.trim().toLocaleLowerCase("en");
+
+  if (!normalizedQuery) {
+    return [...items];
+  }
+
+  return items.filter((item) =>
+    [item.title, item.platform, item.status].some((value) =>
+      value.toLocaleLowerCase("en").includes(normalizedQuery),
+    ),
+  );
+}
+
 function metricCardTemplate(label, value) {
   return `
     <article class="metric-card">
@@ -118,6 +132,8 @@ function renderDashboard(doc = document) {
   const metricGrid = doc.querySelector("#metric-grid");
   const contentGrid = doc.querySelector("#content-grid");
   const lastUpdated = doc.querySelector("#last-updated");
+  const searchInput = doc.querySelector("#content-search");
+  const resultsStatus = doc.querySelector("#content-results");
 
   metricGrid.innerHTML = [
     metricCardTemplate("Posts published", summary.published),
@@ -126,7 +142,16 @@ function renderDashboard(doc = document) {
     metricCardTemplate("Posts scheduled", summary.scheduled),
   ].join("");
 
-  contentGrid.innerHTML = contentItems.map(contentCardTemplate).join("");
+  const renderContent = (query = "") => {
+    const matches = filterContent(contentItems, query);
+    contentGrid.innerHTML = matches.length
+      ? matches.map(contentCardTemplate).join("")
+      : '<p class="empty-state">No content matches this search.</p>';
+    resultsStatus.textContent = `${matches.length} of ${contentItems.length} items shown`;
+  };
+
+  renderContent();
+  searchInput.addEventListener("input", (event) => renderContent(event.target.value));
   lastUpdated.textContent = "Updated from this week's content log";
 }
 
@@ -139,6 +164,7 @@ if (typeof module !== "undefined") {
     contentItems,
     summarizeContent,
     formatCompactNumber,
+    filterContent,
     metricCardTemplate,
     contentCardTemplate,
   };

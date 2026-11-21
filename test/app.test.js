@@ -5,6 +5,7 @@ const {
   contentItems,
   summarizeContent,
   formatCompactNumber,
+  filterContent,
   metricCardTemplate,
   contentCardTemplate,
 } = require("../app.js");
@@ -12,6 +13,18 @@ const {
 test("sample content includes published and scheduled work", () => {
   assert.ok(contentItems.some((item) => item.status === "Published"));
   assert.ok(contentItems.some((item) => item.status === "Scheduled"));
+});
+
+test("filterContent matches title, platform, and status without changing the source", () => {
+  const items = [
+    { title: "Desk reset", platform: "YouTube", status: "Published" },
+    { title: "Weekly note", platform: "Newsletter", status: "Scheduled" },
+  ];
+
+  assert.deepEqual(filterContent(items, " NEWS "), [items[1]]);
+  assert.deepEqual(filterContent(items, "published"), [items[0]]);
+  assert.deepEqual(filterContent(items, ""), items);
+  assert.notEqual(filterContent(items, ""), items);
 });
 
 test("summarizeContent totals only published performance", () => {
