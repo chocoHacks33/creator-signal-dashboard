@@ -79,6 +79,10 @@ function formatCompactNumber(value) {
   }).format(value);
 }
 
+function requestPrint(printFn) {
+  printFn();
+}
+
 function metricCardTemplate(label, value) {
   return `
     <article class="metric-card">
@@ -118,6 +122,7 @@ function renderDashboard(doc = document) {
   const metricGrid = doc.querySelector("#metric-grid");
   const contentGrid = doc.querySelector("#content-grid");
   const lastUpdated = doc.querySelector("#last-updated");
+  const printButton = doc.querySelector("#print-dashboard");
 
   metricGrid.innerHTML = [
     metricCardTemplate("Posts published", summary.published),
@@ -128,6 +133,7 @@ function renderDashboard(doc = document) {
 
   contentGrid.innerHTML = contentItems.map(contentCardTemplate).join("");
   lastUpdated.textContent = "Updated from this week's content log";
+  printButton.addEventListener("click", () => requestPrint(() => window.print()));
 }
 
 if (typeof document !== "undefined") {
@@ -139,6 +145,7 @@ if (typeof module !== "undefined") {
     contentItems,
     summarizeContent,
     formatCompactNumber,
+    requestPrint,
     metricCardTemplate,
     contentCardTemplate,
   };

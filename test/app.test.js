@@ -5,6 +5,7 @@ const {
   contentItems,
   summarizeContent,
   formatCompactNumber,
+  requestPrint,
   metricCardTemplate,
   contentCardTemplate,
 } = require("../app.js");
@@ -12,6 +13,16 @@ const {
 test("sample content includes published and scheduled work", () => {
   assert.ok(contentItems.some((item) => item.status === "Published"));
   assert.ok(contentItems.some((item) => item.status === "Scheduled"));
+});
+
+test("requestPrint delegates to the supplied print implementation", () => {
+  let calls = 0;
+
+  requestPrint(() => {
+    calls += 1;
+  });
+
+  assert.equal(calls, 1);
 });
 
 test("summarizeContent totals only published performance", () => {
