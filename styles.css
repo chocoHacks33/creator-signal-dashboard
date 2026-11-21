@@ -214,6 +214,17 @@ h2 {
   font-size: 0.86rem;
 }
 
+.schedule-timing {
+  width: fit-content;
+  margin: -0.75rem 0 1.2rem;
+  padding: 0.28rem 0.55rem;
+  border-radius: 0.45rem;
+  background: #fff4ed;
+  color: #8b431f;
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
 .card-stats {
   margin-top: auto;
   padding-top: 1rem;

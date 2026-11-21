@@ -5,6 +5,8 @@ const {
   contentItems,
   summarizeContent,
   formatCompactNumber,
+  daysUntil,
+  scheduleTimingLabel,
   metricCardTemplate,
   contentCardTemplate,
 } = require("../app.js");
@@ -12,6 +14,45 @@ const {
 test("sample content includes published and scheduled work", () => {
   assert.ok(contentItems.some((item) => item.status === "Published"));
   assert.ok(contentItems.some((item) => item.status === "Scheduled"));
+});
+
+test("daysUntil compares date-only values at UTC midnight", () => {
+  assert.equal(daysUntil("2026-11-22", new Date("2026-11-21T23:30:00Z")), 1);
+  assert.equal(daysUntil("2026-11-22", new Date("2026-11-22T07:30:00Z")), 0);
+  assert.equal(daysUntil("2026-11-20", new Date("2026-11-22T07:30:00Z")), -2);
+});
+
+test("scheduleTimingLabel describes upcoming and overdue posts", () => {
+  const today = new Date("2026-11-21T12:00:00Z");
+
+  assert.equal(
+    scheduleTimingLabel({ status: "Scheduled", publishedAt: "2026-11-22" }, today),
+    "Scheduled for tomorrow",
+  );
+  assert.equal(
+    scheduleTimingLabel({ status: "Scheduled", publishedAt: "2026-11-19" }, today),
+    "2 days overdue",
+  );
+  assert.equal(
+    scheduleTimingLabel({ status: "Published", publishedAt: "2026-11-22" }, today),
+    "",
+  );
+});
+
+test("scheduled cards include their UTC-safe timing label", () => {
+  const html = contentCardTemplate(
+    {
+      title: "Tomorrow's upload",
+      platform: "YouTube",
+      status: "Scheduled",
+      publishedAt: "2026-11-22",
+      views: 0,
+      followersGained: 0,
+    },
+    new Date("2026-11-21T23:00:00Z"),
+  );
+
+  assert.match(html, /Scheduled for tomorrow/);
 });
 
 test("summarizeContent totals only published performance", () => {
